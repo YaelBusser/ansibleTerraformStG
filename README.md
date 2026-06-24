@@ -20,3 +20,39 @@ ansible-playbook ansible/playbooks/update_stg.yml --limit plateforme2 --extra-va
 
 ## Terraform (Provisioning)
 Définition déclarative de l'infrastructure virtuelle sous-jacente des plateformes StG (exemple via VMware vSphere).
+
+---
+
+## 🧪 Comment tester ce POC (Sans infrastructure réelle)
+
+Dans le cadre d'une démonstration ou d'une évaluation où les 48 machines Windows de production ne sont pas disponibles, il est possible de valider le fonctionnement de ce code en toute sécurité.
+
+### 1. Vérification syntaxique (Syntax Check)
+Permet de s'assurer que le code Ansible et Terraform est valide et bien structuré.
+
+**Ansible :**
+```bash
+ansible-playbook ansible/playbooks/update_nvidia.yml --syntax-check
+```
+
+**Terraform :**
+```bash
+cd terraform
+terraform init
+terraform validate
+```
+
+### 2. Simulation d'exécution (Dry Run)
+C'est la méthode idéale pour une démonstration. Les outils simulent l'exécution et affichent les changements qu'ils feraient, **sans modifier le moindre paramètre réel**.
+
+**Ansible (Nécessite une connexion WinRM vers au moins une machine cible joignable) :**
+```bash
+# Le paramètre -C (ou --check) active le mode simulation
+ansible-playbook ansible/playbooks/update_nvidia.yml -C --limit plateforme1
+```
+
+**Terraform :**
+```bash
+cd terraform
+terraform plan
+```
