@@ -1,0 +1,33 @@
+---
+- name: Mise à jour drivers NVIDIA sur le parc StG
+  hosts: "{{ target_platform | default('all') }}"
+  serial: 4
+  gather_facts: true
+
+  tasks:
+    - name: Vérifier la version du driver actuellement installé
+      win_command: nvidia-smi --query-gpu=driver_version --format=csv,noheader
+      register: current_driver
+      changed_when: false
+      ignore_errors: true
+
+    - name: Afficher la version courante
+      debug:
+        msg: "Driver actuel sur {{ inventory_hostname }} : {{ current_driver.stdout | default('NVIDIA non détecté') }}"
+
+    - name: Copier l'installeur sur la machine cible depuis le dépôt local AlmaLinux
+      win_copy:
+        src: "{{ nvidia_installer_path | default('/opt/stg/depot/nvidia_installer.exe') }}"
+        dest: "C:\\Temp\\nvidia_installer.exe"
+
+    - name: Lancer l'installation en mode silencieux
+      win_package:
+        path: "C:\\Temp\\nvidia_installer.exe"
+        arguments: "/s /noreboot"
+        state: present
+
+    - name: Redémarrer si nécessaire
+      win_reboot:
+        msg: "Redémarrage post-install NVIDIA"
+        pre_reboot_delay: 10
+      when: ansible_reboot_pending | default(false)

@@ -1,0 +1,11 @@
+---
+ansible_user: admin_stg
+# Le mot de passe devrait être protégé par Ansible Vault en production
+ansible_password: "{{ vault_admin_stg_password | default('StgAdminP@ssw0rd!') }}"
+
+ansible_connection: winrm
+ansible_winrm_transport: ntlm
+ansible_winrm_server_cert_validation: ignore
+
+# Chemin du dépôt local sur le serveur AlmaLinux
+depot_local_path: /opt/stg/depot

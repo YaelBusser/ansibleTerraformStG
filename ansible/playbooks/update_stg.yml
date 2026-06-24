@@ -1,0 +1,22 @@
+---
+- name: Déploiement et mise à jour du simulateur StG
+  hosts: "{{ target_platform | default('all') }}"
+  serial: 4
+
+  tasks:
+    - name: S'assurer que le service StG-Simulator est arrêté avant la copie
+      win_service:
+        name: StG-Simulator
+        state: stopped
+      ignore_errors: true
+
+    - name: Copier les nouveaux fichiers du simulateur
+      win_copy:
+        src: "{{ depot_local_path }}/stg_v{{ stg_version }}/"
+        dest: "C:\\Program Files\\StG-Simulator\\"
+
+    - name: S'assurer que le service StG-Simulator est redémarré
+      win_service:
+        name: StG-Simulator
+        state: started
+        start_mode: auto
